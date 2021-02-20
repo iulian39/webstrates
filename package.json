@@ -1,0 +1,103 @@
+{
+  "name": "Webstrates",
+  "version": "1.7.0",
+  "description": "Webstrates is a research prototype enabling collaborative editing of websites through DOM manipulations realized by Operational Transformation using ShareJS. Webstrates observes changes to the DOM using MutationObservers.",
+  "keywords": [
+    "Operational Transformation",
+    "HCI",
+    "Collaborative Editing"
+  ],
+  "scripts": {
+    "start": "npm run build && node webstrates.js",
+    "build": "webpack -p",
+    "watch": "webpack -w",
+    "test": "mocha --bail tests/unit-tests tests/functional-tests"
+  },
+  "homepage": "https://www.webstrates.net/",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Kristian Borup Antonsen",
+    "email": "kba@cs.au.dk"
+  },
+  "contributors": [
+    {
+      "name": "Clemens N. Klokmose",
+      "email": "clemens@cavi.au.dk"
+    },
+    {
+      "name": "Roman Rädle",
+      "email": "me@romanraedle.com"
+    },
+    {
+      "name": "Rolf Bagge",
+      "email": "rolf@cavi.au.dk"
+    }
+  ],
+  "dependencies": {
+    "@babel/core": "7.8.0",
+    "@babel/preset-env": "^7.8.2",
+    "archiver": "1.3.0",
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-runtime": "^6.26.0",
+    "body-parser": "1.19.0",
+    "bson": "4.0.3",
+    "client-sessions": "0.8.0",
+    "console-stamp": "0.2.9",
+    "csvtojson": "1.1.12",
+    "diff-match-patch": "1.0.4",
+    "express": "4.17.1",
+    "express-ws": "4.0.0",
+    "fs-sync": "1.0.6",
+    "graceful-fs": "4.2.3",
+    "html-to-jsonml": "0.0.6",
+    "http-auth": "3.2.4",
+    "human-readable-ids": "1.0.4",
+    "json0-ot-diff": "1.0.5",
+    "jsonml-tools": "git+http://github.com/Webstrates/jsonml-tools.git#master",
+    "md5-file": "4.0.0",
+    "mime-types": "2.1.26",
+    "mongodb": "3.4.1",
+    "multer": "1.4.2",
+    "optimist": "0.6.1",
+    "os": "0.1.1",
+    "passport": "0.4.1",
+    "passport-github": "0.1.5",
+    "passport-google-oauth2": "0.2.0",
+    "passport-oauth2-profilemap": "0.0.1",
+    "redis": "2.8.0",
+    "request": "2.88.0",
+    "sharedb": "1.1.0",
+    "sharedb-mongo": "1.0.0-beta.11",
+    "sharedb-redis-pubsub": "1.0.0-beta.1",
+    "shortid": "2.2.15",
+    "tmp": "0.1.0",
+    "url": "0.11.0",
+    "webpack": "^4.43.0",
+    "wrapper-webpack-plugin": "1.0.0",
+    "y-array": "^10.1.4",
+    "y-memory": "^8.0.9",
+    "y-webrtc": "^10.1.5",
+    "yauzl": "2.10.0",
+    "yjs": "^13.0.5"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "chai": "4.2.0",
+    "eslint": "4.19.1",
+    "eslint-loader": "^2.1.2",
+    "mocha": "^7.1.2",
+    "puppeteer": "1.20.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.5.5"
+  }
+}

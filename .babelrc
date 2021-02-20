@@ -1,0 +1,6 @@
+{
+  "presets": ["es2015", "stage-0", "react"],
+  "plugins": ["@babel/plugin-transform-template-literals","env",
+    "stage-0",
+    "react","transform-object-rest-spread"]
+}
