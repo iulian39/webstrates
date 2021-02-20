@@ -7,12 +7,12 @@ let locationObject;
  * @param  {Location} location Location object.
  * @return {object}            Object with webstrateId, tagOrVersion and parameters.
  */
-coreUtilsModule.getLocationObject = () => {
+coreUtilsModule.getLocationObject = (pathname) => {
 	if (locationObject) {
 		return locationObject;
 	}
 
-	const pathRegex = /^\/([A-Z0-9._-]+)\/(?:([A-Z0-9_-]+)\/)?/i.exec(window.location.pathname);
+	const pathRegex = /^\/([A-Z0-9._-]+)\/(?:([A-Z0-9_-]+)\/)?/i.exec(pathname || window.location.pathname);
 	const [ , webstrateId, tagOrVersion] = pathRegex;
 
 	const parameters = {};

@@ -1,26 +1,35 @@
 'use strict';
-const coreEvents = require('./webstrates/coreEvents');
-const coreDOM = require('./webstrates/coreDOM');
-const coreDatabase = require('./webstrates/coreDatabase');
-const coreMutation = require('./webstrates/coreMutation');
-const coreOpApplier = require('./webstrates/coreOpApplier');
-const coreOpCreator = require('./webstrates/coreOpCreator');
-const corePopulator = require('./webstrates/corePopulator');
-const coreUtils = require('./webstrates/coreUtils');
+const isElectron = require('is-electron');
+let basePath = './';
+if(isElectron()) basePath = './client/';
+
+const coreEvents = require(basePath + 'webstrates/coreEvents');
+const coreDOM = require(basePath + 'webstrates/coreDOM');
+const coreDatabase = require(basePath + 'webstrates/coreDatabase');
+const coreMutation = require(basePath + 'webstrates/coreMutation');
+const coreOpApplier = require(basePath + 'webstrates/coreOpApplier');
+const coreOpCreator = require(basePath + 'webstrates/coreOpCreator');
+const corePopulator = require(basePath + 'webstrates/corePopulator');
+const coreUtils = require(basePath + 'webstrates/coreUtils');
+const config = require(basePath + 'config');
 
 //const coreWebsocket = require('./webstrates/coreWebsocket');
 
 // Create an event that'll be triggered once all modules have been loaded.
 coreEvents.createEvent('allModulesLoaded');
 // coreEvents.createEvent('receivedDocument');
-const request = coreUtils.getLocationObject();
+const request = coreUtils.getLocationObject('/Test/');
 
 const protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
 //coreWebsocket.setup(`${protocol}//${location.host}/${request.webstrateId}/${location.search}`);
 
 // Load optional modules.
-config.modules.forEach(module => require('./webstrates/' + module));
+if(!isElectron()) 
+	config.modules.forEach(module => require('./webstrates/' + module));
+else
+	config.modules.forEach(module => require(basePath + 'webstrates/' + module));
 
+console.log('IS ELECTRON: ' + isElectron());
 // Send out an event when all modules have been loaded.
 coreEvents.triggerEvent('allModulesLoaded');
 coreEvents.triggerEvent('clientsReceived');
@@ -35,7 +44,7 @@ if (request.staticMode) {
 }
 else {
 	coreDatabase.subscribe(request.webstrateId).then((arrayDoc) => {
-
+		console.log(request.webstrateId);
 		corePopulator.populate(coreDOM.externalDocument, request.webstrateId, arrayDoc).then(() => {
 			// Emits mutations from changes on the coreDOM.externalDocument.
 			coreMutation.emitMutationsFrom(coreDOM.externalDocument);

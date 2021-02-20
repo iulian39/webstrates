@@ -8,11 +8,13 @@
     "Collaborative Editing"
   ],
   "scripts": {
+    "electron": "electron .",
     "start": "npm run build && node webstrates.js",
     "build": "webpack -p",
     "watch": "webpack -w",
     "test": "mocha --bail tests/unit-tests tests/functional-tests"
   },
+  "main": "main.js",
   "homepage": "https://www.webstrates.net/",
   "license": "Apache-2.0",
   "author": {
@@ -57,6 +59,7 @@
     "html-to-jsonml": "0.0.6",
     "http-auth": "3.2.4",
     "human-readable-ids": "1.0.4",
+    "is-electron": "^2.2.0",
     "json0-ot-diff": "1.0.5",
     "jsonml-tools": "git+http://github.com/Webstrates/jsonml-tools.git#master",
     "md5-file": "4.0.0",
@@ -91,6 +94,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "chai": "4.2.0",
+    "electron": "^11.3.0",
     "eslint": "4.19.1",
     "eslint-loader": "^2.1.2",
     "mocha": "^7.1.2",
