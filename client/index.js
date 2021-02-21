@@ -1,7 +1,7 @@
 'use strict';
 const isElectron = require('is-electron');
 let basePath = './';
-if(isElectron()) basePath = './client/';
+if (isElectron()) basePath = './client/';
 
 const coreEvents = require(basePath + 'webstrates/coreEvents');
 const coreDOM = require(basePath + 'webstrates/coreDOM');
@@ -13,48 +13,57 @@ const corePopulator = require(basePath + 'webstrates/corePopulator');
 const coreUtils = require(basePath + 'webstrates/coreUtils');
 const config = require(basePath + 'config');
 
-//const coreWebsocket = require('./webstrates/coreWebsocket');
+const randomName = () => {
+	document.getElementById('webstrateName').value = 'Hello World'
+	console.log("asd")
+};
 
-// Create an event that'll be triggered once all modules have been loaded.
-coreEvents.createEvent('allModulesLoaded');
-// coreEvents.createEvent('receivedDocument');
-const request = coreUtils.getLocationObject('/Test/');
+const connectToWebstrate = () => {
+	const webstrateName = document.getElementById('webstrateName').value;
+	loadWebstrates('/' + webstrateName + '/');
+};
 
-const protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
-//coreWebsocket.setup(`${protocol}//${location.host}/${request.webstrateId}/${location.search}`);
+const loadWebstrates = (webstrateId) => {
+	// Create an event that'll be triggered once all modules have been loaded.
+	coreEvents.createEvent('allModulesLoaded');
+	// coreEvents.createEvent('receivedDocument');
+	const request = coreUtils.getLocationObject(webstrateId);
 
-// Load optional modules.
-if(!isElectron()) 
-	config.modules.forEach(module => require('./webstrates/' + module));
-else
-	config.modules.forEach(module => require(basePath + 'webstrates/' + module));
 
-console.log('IS ELECTRON: ' + isElectron());
-// Send out an event when all modules have been loaded.
-coreEvents.triggerEvent('allModulesLoaded');
-coreEvents.triggerEvent('clientsReceived');
-coreEvents.triggerEvent('connect');
-// coreEvents.triggerEvent('populated');
+	// Load optional modules.
+	if (!isElectron())
+		config.modules.forEach(module => require('./webstrates/' + module));
+	else
+		config.modules.forEach(module => require(basePath + 'webstrates/' + module));
 
-if (request.staticMode) {
-	console.log(request.staticMode);
-	// coreDatabase.fetch(request.webstrateId, request.tagOrVersion).then(doc => {
-	// 	corePopulator.populate(coreDOM.externalDocument, doc);
-	// });
-}
-else {
-	coreDatabase.subscribe(request.webstrateId).then((arrayDoc) => {
-		console.log(request.webstrateId);
-		corePopulator.populate(coreDOM.externalDocument, request.webstrateId, arrayDoc).then(() => {
-			// Emits mutations from changes on the coreDOM.externalDocument.
-			coreMutation.emitMutationsFrom(coreDOM.externalDocument);
+	console.log('IS ELECTRON: ' + isElectron());
+	// Send out an event when all modules have been loaded.
+	coreEvents.triggerEvent('allModulesLoaded');
+	coreEvents.triggerEvent('clientsReceived');
+	coreEvents.triggerEvent('connect');
+	// coreEvents.triggerEvent('populated');
 
-			// Emits ops from the mutations emitted by coreMutation.
-			coreOpCreator.emitOpsFromMutations();
+	if (request.staticMode) {
+		console.log(request.staticMode);
+		// coreDatabase.fetch(request.webstrateId, request.tagOrVersion).then(doc => {
+		// 	corePopulator.populate(coreDOM.externalDocument, doc);
+		// });
+	} else {
+		coreDatabase.subscribe(request.webstrateId).then((arrayDoc) => {
+			console.log(request.webstrateId);
+			corePopulator.populate(coreDOM.externalDocument, request.webstrateId, arrayDoc).then(() => {
+				// Emits mutations from changes on the coreDOM.externalDocument.
+				coreMutation.emitMutationsFrom(coreDOM.externalDocument);
 
-			// Apply changes on <html>, not coreDOM.externalDocument.
-			const targetElement = coreDOM.externalDocument.childNodes[0];
-			coreOpApplier.listenForOpsAndApplyOn(targetElement);
+				// Emits ops from the mutations emitted by coreMutation.
+				coreOpCreator.emitOpsFromMutations();
+
+				// Apply changes on <html>, not coreDOM.externalDocument.
+				const targetElement = coreDOM.externalDocument.childNodes[0];
+				coreOpApplier.listenForOpsAndApplyOn(targetElement);
+			});
 		});
-	});
-}
+	}
+};
+
+if (!isElectron()) loadWebstrates();

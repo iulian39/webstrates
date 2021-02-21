@@ -1,33 +1,161 @@
 <!doctype html>
 <html>
+
+<head>
+	<meta charset="UTF-8">
+</head>
+
 <body>
-<p>Loading Webstrates</p>
-<div class="spinner"></div>
-<style type="text/css" media="screen">
-body {
-	font-family: sans-serif;
-	font-weight: 200;
-	-webkit-font-smoothing: antialiased;
-	text-align: center;
-	margin-top: 15%;
-	animation: fadein 1s;
-}
-@keyframes fadein {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-.spinner {
-	width: 40px;
-	height: 40px;
-	margin: 0 auto;
-	background-color: #31a46f;
-	animation: rotateplane 1.2s infinite ease-in-out;
-}
-@keyframes rotateplane {
-	0% { transform: perspective(120px) rotateX(0deg) rotateY(0deg); }
-	50% { transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); }
-	100% { transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); }
-}
-</style>
-<script src="client/index.js"></script>
-</body></html>
+
+	<div class="login_form">
+		<setion class="login-wrapper">
+
+			<div class="logo">
+				<img src="./download.png" alt=""></a>
+			</div>
+
+			<form>
+
+				<label class="label">Webstrate Name</label>
+				<input required type="text" id="webstrateName">
+				<button type="submit" id="connect" onclick="connectToWebstrate()">Connect</button>
+			</form>
+
+			</section>
+	</div>
+	<style type="text/css" media="screen">
+		*,
+		*:before,
+		*:after {
+			-moz-box-sizing: border-box;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+
+		body,
+		html,
+		.login_form {
+			height: 100%;
+		}
+
+		body {
+			background: #fff;
+		}
+
+		.login_form {
+			display: -webkit-box;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-box-flex: center;
+			-moz-box-flex: center;
+			-webkit-flex: center;
+			-ms-flex: center;
+			flex: center;
+			-webkit-justify-content: center;
+			-moz-justify-content: center;
+			justify-content: center;
+			-webkit-box-pack: center;
+			-moz-box-pack: center;
+			-ms-flex-pack: center;
+			-webkit-align-items: center;
+			align-items: center;
+		}
+
+		.login-wrapper {
+			max-width: 500px;
+			width: 100%;
+		}
+
+		.logo {
+			text-align: center;
+		}
+
+		.logo img {
+			max-width: 200px;
+			width: 100%;
+			margin: 1em auto 2em;
+		}
+
+		form {
+			padding: 2em 1em;
+			font-family: helvetica, sans-serif;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+		}
+
+		form label {
+			color: #000;
+			margin: 0 3% 0.25em;
+			display: block;
+			font-family: helvetica, sans-serif;
+		}
+
+		form input {
+			width: 94%;
+			padding: 0.5em 0.25em;
+			margin: 0 3% 1em;
+			font-size: 1.2em;
+			border: 2px solid #000;
+			outline: none;
+			-webkit-transition: all 0.25s;
+			-moz-transition: all 0.25s;
+			-ms-transition: all 0.25s;
+			-o-transition: all 0.25s;
+			transition: all 0.25s;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+		}
+
+		form input.password {
+			padding-right: 4rem;
+		}
+
+		form input:focus {
+			border: 2px solid #1fd100;
+		}
+
+		form button {
+			width: 94%;
+			margin: 2em 3% 0;
+			border: none;
+			background: #31a46f;
+			padding: 1em 0;
+			font-size: 1.25em;
+			clear: both;
+			color: #000;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			outline: none;
+			-webkit-transition: all 0.25s;
+			-moz-transition: all 0.25s;
+			-ms-transition: all 0.25s;
+			-o-transition: all 0.25s;
+			transition: all 0.25s;
+			cursor: pointer;
+		}
+
+		.connect {
+			margin-top: 0;
+		}
+
+		.label {
+			font-size: 2.5em;
+			text-align: center;
+		}
+
+		form button:focus,
+		form button:hover {
+			background: #05681a;
+		}
+	</style>
+
+
+	<script src="client/index.js"></script>
+</body>
+
+</html>
