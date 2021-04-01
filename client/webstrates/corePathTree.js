@@ -1,5 +1,6 @@
 'use strict';
 const coreUtils = require('./coreUtils');
+const isAutomerge = false;
 /*
 Webstrates PathTree (webstrates.pathree.js)
 
@@ -70,6 +71,7 @@ function PathTree(DOMNode, parentPathTree, overwrite) {
  * @private
  */
 function isTransientElement(DOMNode) {
+	if (isAutomerge) return false;
 	// Only elements can be transient
 	return DOMNode.nodeType === document.ELEMENT_NODE
 		// Nothing in templates can be transient

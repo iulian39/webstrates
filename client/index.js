@@ -5,6 +5,7 @@ if (isElectron()) basePath = './client/';
 
 const coreEvents = require(basePath + 'webstrates/coreEvents');
 const coreDOM = require(basePath + 'webstrates/coreDOM');
+const coreJsonML = require(basePath + 'webstrates/coreJsonML');
 const coreDatabase = require(basePath + 'webstrates/coreDatabase');
 const coreMutation = require(basePath + 'webstrates/coreMutation');
 const coreOpApplier = require(basePath + 'webstrates/coreOpApplier');
@@ -13,10 +14,10 @@ const corePopulator = require(basePath + 'webstrates/corePopulator');
 const coreUtils = require(basePath + 'webstrates/coreUtils');
 const config = require(basePath + 'config');
 
-const randomName = () => {
-	document.getElementById('webstrateName').value = 'Hello World'
-	console.log("asd")
-};
+// json ml putin diferit /done
+// path tree putin diferit /done
+// mutation modificat masiv
+// corePatch e nou /don
 
 const connectToWebstrate = () => {
 	const webstrateName = document.getElementById('webstrateName').value;

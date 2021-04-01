@@ -29,9 +29,11 @@ corePopulator.populate = function(rootElement, webstrateId, arrayDoc) {
 			[ 'title', {}, webstrateId ], '\n'], '\n',
 		[ 'body', {}, '\n' ]
 	]}];
-	const initalizeOp = [{od: null,oi: 'true',p: [5, 1, 'data-gr-c-s-loaded']}];
+	const initalizeOp = [{od: null, oi: 'true',p: [5, 1, 'data-gr-c-s-loaded']}];
+	const contentEditable = [{od: null, oi: "true",p: [5, 1, "contenteditable"]}];
 	arrayDoc = json0.type.apply([], op);
 	arrayDoc = json0.type.apply(arrayDoc, initalizeOp);
+	arrayDoc = json0.type.apply(arrayDoc, contentEditable);
 	coreEvents.triggerEvent('initialize', arrayDoc);
 
 	console.log('Operation is:' +op);

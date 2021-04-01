@@ -610,7 +610,7 @@ function applyOp(op, rootElement) {
 }
 
 coreOpApplier.listenForOpsAndApplyOn = (rootElement) => {
-	coreEvents.addEventListener('receivedOps', (ops) => {
+	coreEvents.addEventListener('receivedOps', (ops, doc, webstrateId) => {
 		// We disable the mutation observers before applying the operations. Otherwise, applying the
 		// operations would cause new mutations to be created, which in turn would cause the
 		// creation of new operations, leading to a livelock for all clients.
@@ -619,8 +619,25 @@ coreOpApplier.listenForOpsAndApplyOn = (rootElement) => {
 		ops.forEach((op) => {
 			applyOp(op, rootElement);
 		});
+		
+		// const scripts = [];
+		// const html = coreJsonML.toHTML(doc, undefined, scripts);
+		// coreUtils.executeScripts(scripts, () => {})
+		// if(scripts.length > 0)
+		// 	console.log(scripts.length)
+		// coreUtils.appendChildWithoutScriptExecution(rootElement, html);
+	
+		// coreUtils.executeScripts(scripts, () => {
+		// 	console.log('populated');
+		// 	// Do not include the parent element in the path, i.e. create corePathTree on the <html>
+		// 	// element rather than the document element.
+		// 	const targetElement = rootElement.childNodes[0];
+		// 	const pathTree = corePathTree.create(targetElement, null, true);
+		// 	coreEvents.triggerEvent('populated', targetElement, webstrateId);
+		// });
 
 		// And re-enable MuationObservers.
+	
 		coreMutation.resume();
 	}, coreEvents.PRIORITY.IMMEDIATE);
 };

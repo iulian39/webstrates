@@ -1,6 +1,8 @@
 'use strict';
 const coreEvents = require('./coreEvents');
 const coreUtils = require('./coreUtils');
+const coreJsonML = require('./coreJsonML');
+const corePathTree = require('./corePathTree')
 //const coreWebsocket = require('./coreWebsocket');
 const globalObject = require('./globalObject');
 const Y = require('yjs');
@@ -18,6 +20,7 @@ coreEvents.createEvent('initialize');
 // import { WebrtcProvider } from 'y-webrtc'
 
 let doc, provider, arrayOp, opCounter = 0;
+const ydoc = new Y.Doc();
 
 // const ydoc = new Y.Doc()
 //  const provider = new WebrtcProvider('myRoom', ydoc)
@@ -42,13 +45,13 @@ exports.getDocument = path => {
  * @public
  */
 exports.elementAtPath = (snapshot, path) => {
-// Snapshot is optional (and only used in the internal recursion).
+	// Snapshot is optional (and only used in the internal recursion).
 	if (!path) {
 		path = snapshot;
 		snapshot = doc;
 	}
 
-	if (path.length > 0 && typeof path[path.length-1] === 'string') {
+	if (path.length > 0 && typeof path[path.length - 1] === 'string') {
 		return null;
 	}
 
@@ -77,13 +80,19 @@ Object.defineProperty(globalObject.publicObject, 'getDocument', {
 	}
 });
 
-const observeFunction = (ev) => {
+const observeFunction = () => {
 	let ops = [];
 	let allOps = arrayOp.toArray();
 
 	// Check what operations to apply
-	for (let i = opCounter, size = allOps.length; i < size; i++)
-		ops.push(allOps[i]);
+	console.log("Operations Start")
+	for (let i = opCounter, size = allOps.length; i < size; i++) {
+		ops.push({
+			...allOps[i]
+		});
+		console.log(allOps[i].p)
+	}
+	console.log("Operations End")
 
 	opCounter += ops.length;
 	if (ops.length) {
@@ -91,8 +100,41 @@ const observeFunction = (ev) => {
 		doc = json0.type.apply(doc, ops);
 	}
 	// Apply changes to the DOM
-	coreEvents.triggerEvent('receivedOps', ops);
+	coreEvents.triggerEvent('receivedOps', ops, doc, "test");
 	console.log('RECEIVED AT : ' + new Date().getTime());
+	const scripts = [];
+	const html = coreJsonML.toHTML(doc, undefined, scripts);
+	// coreUtils.executeScripts(scripts, () => {})
+
+	// // debugger
+	// console.log(scripts.length)
+	// coreUtils.appendChildWithoutScriptExecution(coreDOM.externalDocument, html);
+
+	// coreUtils.executeScripts(scripts, () => {
+	// 	console.log('populated');
+	// 	// Do not include the parent element in the path, i.e. create corePathTree on the <html>
+	// 	// element rather than the document element.
+	// 	const targetElement = coreDOM.externalDocument.childNodes[0];
+	// 	const pathTree = corePathTree.create(targetElement, null, true);
+	// 	coreEvents.triggerEvent('populated', targetElement, webstrateId);
+	// });
+
+	// const scripts = [];
+	// const html = coreJsonML.toHTML(doc, undefined, scripts);
+	// // debugger
+	// console.log(scripts.length)
+	// coreUtils.appendChildWithoutScriptExecution(coreDOM.externalDocument, html);
+
+	// 	coreUtils.executeScripts(scripts, () => {});
+		// 	console.log('populated');
+		// 	// Do not include the parent element in the path, i.e. create corePathTree on the <html>
+		// 	// element rather than the document element.
+		// 	const targetElement = coreDOM.externalDocument.childNodes[0];
+		// 	const pathTree = corePathTree.create(targetElement, null, true);
+		// 	pathTree.check();
+		// 	// coreEvents.triggerEvent('populated', targetElement, webstrateId);
+		// });
+	
 };
 
 
@@ -119,34 +161,36 @@ exports.subscribe = webstrateId => {
 
 		// Get ShareDB document for webstrateId.
 		// doc = conn.get(COLLECTION_NAME, webstrateId);
-		const ydoc = new Y.Doc();
+		
 		provider = new rtc.WebrtcProvider(webstrateId, ydoc);
-		arrayOp = provider.doc.getArray('op');
-		arrayOp.observe(observeFunction);
+		arrayOp = ydoc.getArray('op');
+		arrayOp.observeDeep(observeFunction);
 
 		doc = [];
-		coreEvents.triggerEvent('receivedDocument', doc, { static: false });
+		coreEvents.triggerEvent('receivedDocument', doc, {
+			static: false
+		});
 		coreEvents.triggerEvent('opsAcknowledged');
-			
+
 		coreEvents.addEventListener('initialize', (data) => {
 			doc = data;
 		});
 
 		coreEvents.addEventListener('createdOps', (ops) => {
 			// Apply operations to the JsonML document
-			doc = json0.type.apply(doc, ops);
-			
+			doc = json0.type.apply(doc, ops.slice());
+
 			// Update the last applied operations
-			opCounter += ops.length;
-			
+			opCounter += ops.slice().length;
+
 			// Add the operations to the y-array
 			console.log('SENT AT : ' + new Date().getTime());
-			arrayOp.push([...ops]);			
+			arrayOp.push(ops.slice());
 
 		}, coreEvents.PRIORITY.IMMEDIATE);
 
-		
-		
+
+
 		// 	doc.on('op', (ops, opsSource) => {
 		// 		// We don't broadcast a 'receivedOps' event for ops we create ourselves, as we haven't
 		// 		// received them from anybody.
@@ -240,3 +284,62 @@ exports.getOps = (webstrateId, fromVersion, toVersion, callback) => {
 	// 	to: toVersion
 	// }, callback);
 };
+
+var searchText = " Аsk for trade ";
+var proceedText = " Proceed ";
+
+const findButton = (text) => {
+	const tags = document.getElementsByTagName("button");
+	for (var i = 0; i < tags.length; i++) {
+        if (tags[i].textContent == searchText) {
+            return tags[i];
+        }
+    }
+}
+
+acceptBtn = findButton(searchText)
+while(acceptBtn){
+	acceptBtn.click();
+	await new Promise((resolve) => setTimeout(() => {
+		proceedBtn = findButton(proceedText);
+		if(proceedBtn) proceedBtn.click();
+	resolve();
+	}, 6000));
+	await new Promise((resolve) => setTimeout(() => {
+		//close
+		proceedBtn = findButton(proceedText);
+		if(proceedBtn) proceedBtn.click();
+		resolve();
+	}, 4000));
+	await new Promise((resolve) => setTimeout(() => {
+		//just wait a little..
+		resolve();
+	}, 4000));
+	acceptBtn = findButton(searchText);
+}
+
+
+var aTags = document.getElementsByTagName("button");
+	
+    var found = [];
+
+    for (var i = 0; i < aTags.length; i++) {
+        if (aTags[i].textContent == searchText) {
+            found.push(aTags[i]);
+        }
+    }
+    if(found.length > 0)
+        for (let i of found) {
+			i.click();  
+			await new Promise((resolve) => setTimeout(() => {
+				bTags  = document.getElementsByTagName("button");
+			for (var i = 0; i < bTags.length; i++) {
+				if (bTags[i].textContent == proceedText) {
+					bTags[i].click();
+					break;
+				}
+			}
+			resolve();
+			}, 5000));
+			console.log("ASDD")
+		}

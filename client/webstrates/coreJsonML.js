@@ -8,7 +8,7 @@ const coreUtils = require('./coreUtils');
 const coreDOM = require('./coreDOM');
 
 const coreJsonML = {};
-
+const isAutomerge = false; 
 function isPlainObject(obj) {
 	return obj && typeof obj === 'object'
 	// Previously, we did comparison like: Object.getPrototypeOf(obj) === Object.prototype, but we
@@ -82,14 +82,14 @@ function toHTML(elem, xmlNs, scripts) {
 					if (xmlNs === 'http://www.w3.org/2000/svg') {
 						if (index === 'href' || index === 'xlink:href') {
 							selector.setAttributeNS('http://www.w3.org/1999/xlink', index, value,
-								coreDOM.elementOptions);
+								isAutomerge? {} : coreDOM.elementOptions);
 						}
 					}
 					const isSvgPath = selector.tagName.toLowerCase() === 'path' && index === 'd';
 					if (isSvgPath) {
 						selector.__d = value;
 					}
-					selector.setAttribute(coreUtils.unescapeDots(index), value, coreDOM.elementOptions);
+					selector.setAttribute(coreUtils.unescapeDots(index), value, isAutomerge? {} : coreDOM.elementOptions);
 				}
 
 				// Add scripts to our scripts list, so we can execute them later synchronously.
@@ -157,7 +157,7 @@ function addChildren(/*DOM*/ elem, /*function*/ filter, /*JsonML*/ jml) {
 function fromHTML(elem, filter) {
 	// If an element doesn't have a PathTree, we don't want it in the JsonML. This will be the case
 	// for <transient> elements.
-	if (!elem || !elem.nodeType || !elem.__pathNodes || elem.__pathNodes.length === 0) {
+	if (!isAutomerge && (!elem || !elem.nodeType || !elem.__pathNodes || elem.__pathNodes.length === 0)) {
 		// free references
 		return (elem = null);
 	}
@@ -175,7 +175,7 @@ function fromHTML(elem, filter) {
 
 			for (i=0; attr && i<attr.length; i++) {
 				// Transient attributes should not be added to the JsonML.
-				if (config.isTransientAttribute(elem, attr[i].name)) {
+				if (!isAutomerge && config.isTransientAttribute(elem, attr[i].name)) {
 					continue;
 				}
 				if (attr[i].specified) {
