@@ -34,6 +34,7 @@ function createEventsOnEventObject(node, eventObject) {
 // This gets triggered (in nodeObjects) when the page has loaded initially and nodes have had
 // webstrate objects added to them.
 coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
+	
 	coreUtils.recursiveForEach(nodes, (node) => {
 		const eventObject = nodeObjects.getEventObject(node);
 		createEventsOnEventObject(node, eventObject);
@@ -43,6 +44,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 		local) => {
 		// Finding the event object (i.e. the webstrate.on() related events) for the node and firing
 		// the attributeChanged event in userland.
+		
 		const eventObject = nodeObjects.getEventObject(node);
 		// Only trigger the main event for remote changes (i.e. changes made by other clients).
 		if (!local) {
@@ -56,6 +58,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 		// Finding the event object (i.e. the webstrate.on() related events) for the node and firing
 		// the attributeChanged event in userland.
 		const eventObject = nodeObjects.getEventObject(node);
+		
 		if (!local) {
 			eventObject.triggerEvent('attributeChanged', attributeName, oldValue, undefined, !!local);
 		}
@@ -65,6 +68,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 	coreEvents.addEventListener('DOMNodeInserted', (node, parentElement, local) => {
 		// Finding the event object of the parent instead of the node itself, as firing the event
 		// on the node itself isn't very useful.
+		console.log('domEvents DOMNodeInserted');
 		const eventObject = nodeObjects.getEventObject(parentElement);
 
 		// They parent may have been deleted, in which case there's no event object.
@@ -79,6 +83,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 	coreEvents.addEventListener('DOMNodeDeleted', (node, parentElement, local) => {
 		// Finding the event object of the parent instead of the node itself, as firing the event
 		// on the node itself isn't very useful.
+		console.log('domEvents DOMNodeDeleted');
 		const eventObject = nodeObjects.getEventObject(parentElement);
 
 		// They parent may have been deleted, in which case there's no event object.
@@ -94,6 +99,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 		value, local) => {
 		// Finding the event object (i.e. the webstrate.on() related events) for the node and firing
 		// the attributeChanged event in userland.
+		
 		const eventObject = nodeObjects.getEventObject(node);
 		if (!local) {
 			eventObject.triggerEvent('insertText', position, value, attributeName, !!local);
@@ -103,6 +109,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 
 	coreEvents.addEventListener('DOMTextNodeInsertion', (node, parentElement, position, value,
 		local) => {
+		
 		let eventObject = nodeObjects.getEventObject(node);
 		if (!local) {
 			eventObject.triggerEvent('insertText', position, value, !!local);
@@ -120,6 +127,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 
 	coreEvents.addEventListener('DOMAttributeTextDeletion', (node, attributeName, position,
 		value, local) => {
+		
 		// Finding the event object (i.e. the webstrate.on() related events) for the node and firing
 		// the attributeChanged event in userland.
 		const eventObject = nodeObjects.getEventObject(node);
@@ -131,6 +139,7 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 
 	coreEvents.addEventListener('DOMTextNodeDeletion', (node, parentElement, position, value,
 		local) => {
+		
 		let eventObject = nodeObjects.getEventObject(node);
 		if (eventObject) {
 			if (!local) {
@@ -151,5 +160,6 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 
 // This gets triggered when an node gets added after the initial page load.
 coreEvents.addEventListener('webstrateObjectAdded', (node, eventObject) => {
+	
 	createEventsOnEventObject(node, eventObject);
 }, coreEvents.PRIORITY.IMMEDIATE);

@@ -246,6 +246,8 @@ coreUtilsModule.executeScripts = (scripts, callback) => {
 	newScript.innerHTML = script.innerHTML;
 
 	script.parentElement.insertBefore(newScript, script);
+	
+	console.log('Arrived before target path node 9');
 	script.remove();
 
 	if (executeImmediately) {

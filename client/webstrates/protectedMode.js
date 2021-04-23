@@ -222,6 +222,8 @@ coreEvents.addEventListener('receivedDocument', (doc, options) => {
 	const cloneNode = Node.prototype.cloneNode;
 	Node.prototype.cloneNode = function (deep, options, ...unused) {
 		const node = cloneNode.call(this, deep, ...unused);
+		
+		console.log('Arrived before target path node 3');
 		delete node.approved;
 		if (options && options.approved) approveNode(node);
 		return node;

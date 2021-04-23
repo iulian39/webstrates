@@ -54,14 +54,19 @@ const loadWebstrates = (webstrateId) => {
 			console.log(request.webstrateId);
 			corePopulator.populate(coreDOM.externalDocument, request.webstrateId, arrayDoc).then(() => {
 				// Emits mutations from changes on the coreDOM.externalDocument.
-				coreMutation.emitMutationsFrom(coreDOM.externalDocument);
+				
+				// coreMutation.emitMutationsFrom(coreDOM.externalDocument);
+				
 
-				// Emits ops from the mutations emitted by coreMutation.
-				coreOpCreator.emitOpsFromMutations();
+				// // Emits ops from the mutations emitted by coreMutation.
+				// coreOpCreator.emitOpsFromMutations();
 
-				// Apply changes on <html>, not coreDOM.externalDocument.
-				const targetElement = coreDOM.externalDocument.childNodes[0];
-				coreOpApplier.listenForOpsAndApplyOn(targetElement);
+				// // Apply changes on <html>, not coreDOM.externalDocument.
+				// const targetElement = coreDOM.externalDocument.childNodes[0];
+				// coreOpApplier.listenForOpsAndApplyOn(targetElement);
+				// const targetElement = coreDOM.externalDocument.childNodes[0];
+				// coreOpApplier.listenForOpsAndApplyOn(targetElement);
+				// coreMutation.observe(targetElement, arrayDoc);
 			});
 		});
 	}

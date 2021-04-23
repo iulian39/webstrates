@@ -141,7 +141,9 @@ function attachWebstrateObjectToNode(node, triggerEvent) {
 }
 
 coreEvents.addEventListener('populated', targetElement => {
+	
 	coreUtils.recursiveForEach(targetElement, childNode => {
+		
 		// We ensure that all elements in the ShareDB document have wids. If an element has been added
 		// with e.g. Webstrates file system, it will be in the document, but not have a wid yet.
 		coreOpCreator.addWidToElement(childNode);
@@ -160,6 +162,7 @@ coreEvents.addEventListener('populated', targetElement => {
 	// webstrate objects on the entire DOM.
 	coreDOM.overrideDocument('createElementNS', coreDOM.CONTEXT.BOTH, (createElementNS, namespaceURI,
 		qualifiedName, options = {}, ...unused) => {
+		
 		const element = createElementNS(namespaceURI, qualifiedName, options, ...unused);
 		attachWebstrateObjectToNode(element, true); // true to trigger webstrateObjectAdded event.
 		return element;
@@ -167,6 +170,7 @@ coreEvents.addEventListener('populated', targetElement => {
 
 	coreDOM.overrideDocument('createElement', coreDOM.CONTEXT.BOTH, (createElement, tagName,
 		options = {}, ...unused) => {
+		
 		const element = createElement(tagName, options, ...unused);
 		attachWebstrateObjectToNode(element, true);
 		return element;
@@ -174,6 +178,7 @@ coreEvents.addEventListener('populated', targetElement => {
 
 	coreDOM.overrideDocument('importNode', coreDOM.CONTEXT.BOTH, (importNode, externalNode, deep,
 		...unused) => {
+		
 		const element = importNode(externalNode, deep, ...unused);
 		coreUtils.recursiveForEach(element, childNode => {
 			attachWebstrateObjectToNode(childNode, true);
@@ -183,6 +188,7 @@ coreEvents.addEventListener('populated', targetElement => {
 
 	const cloneNode = Element.prototype.cloneNode;
 	Element.prototype.cloneNode = function(deep, ...unused) {
+		
 		const element = cloneNode.call(this, deep, ...unused);
 		coreUtils.recursiveForEach(element, childNode => {
 			attachWebstrateObjectToNode(childNode, true);
@@ -194,6 +200,7 @@ coreEvents.addEventListener('populated', targetElement => {
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMNodeInserted', node => {
+	console.log('nodeObjects DOMNodeInserted');
 	coreUtils.recursiveForEach(node, childNode => {
 		// The second argument is whether to trigger the webstrateObjectAdded event. We do want that.
 		attachWebstrateObjectToNode(childNode, true);
@@ -201,6 +208,7 @@ coreEvents.addEventListener('DOMNodeInserted', node => {
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMTextNodeInsertion', node => {
+	console.log('nodeObjects DOMTextNodeInsertion');
 	// The second argument is whether to trigger the webstrateObjectAdded event. We do want that.
 	attachWebstrateObjectToNode(node, true);
 }, coreEvents.PRIORITY.IMMEDIATE);

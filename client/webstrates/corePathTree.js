@@ -1,6 +1,7 @@
 'use strict';
 const coreUtils = require('./coreUtils');
-const isAutomerge = false;
+const isAutomerge = true;
+let idNr = 0;
 /*
 Webstrates PathTree (webstrates.pathree.js)
 
@@ -38,11 +39,23 @@ function generateUUID() {
  * new PathTree or just appended to it.
  * @return {PathTree} Created PathTree.
  */
-function PathTree(DOMNode, parentPathTree, overwrite) {
+function PathTree(DOMNode, parentPathTree, overwrite, addParentChild) {
 	this.id = generateUUID();
+	
+	// this.id = idNr;
+	// idNr++;
 	this.children = [];
 	this.parent = parentPathTree;
 	this.DOMNode = DOMNode;
+	
+	if(addParentChild !== undefined && addParentChild !== null)
+	{
+		if (addParentChild >= this.parent.children.length) {
+			this.parent.children.push(this);
+		} else {
+			this.parent.children.splice(addParentChild, 0, this);
+		}
+	}
 
 	// When moving an element around, a node may exist in two places at once for a brief moment.
 	// __pathNodes therefore has to be a list.
@@ -71,7 +84,7 @@ function PathTree(DOMNode, parentPathTree, overwrite) {
  * @private
  */
 function isTransientElement(DOMNode) {
-	if (isAutomerge) return false;
+	// if (isAutomerge) return false;
 	// Only elements can be transient
 	return DOMNode.nodeType === document.ELEMENT_NODE
 		// Nothing in templates can be transient
@@ -87,20 +100,20 @@ function isTransientElement(DOMNode) {
  * @param  {[type]} overwrite      [description]
  * @return {[type]}                [description]
  */
-PathTree.create = function(DOMNode, parentPathTree, overwrite) {
+PathTree.create = function(DOMNode, parentPathTree, overwrite, addParentChild) {
 	// Transient elements are not supposed to be persisted, and should thus not be part of the
 	// PathTree. Unless the transient element is in a <template>.
 	if (isTransientElement(DOMNode) || (!parentPathTree && DOMNode !== document.documentElement)) {
 		return;
 	}
 
-	return new PathTree(DOMNode, parentPathTree, overwrite);
+	return new PathTree(DOMNode, parentPathTree, overwrite, addParentChild);
 };
 /**
  * Creates a JsonML representation of the PathTree.
  * @return {JsonML} JsonML representation of PathTree.
  */
-PathTree.prototype.toPath = function() {
+PathTree.prototype.toPath = function(kto) {
 	if (!this.parent) {
 		return [];
 	}
@@ -112,6 +125,10 @@ PathTree.prototype.toPath = function() {
 	// In the JsonML representation, the list elements start at position 2 in the object:
 	//   [tag-name, attributes, ...element-list]
 	var ELEMENT_LIST_OFFSET = 2;
+	if(isAutomerge && childIndex === -1 && kto) {
+		childIndex = 0;
+		console.log('KTTTTTTTTTTTTTTTTTOOOOOOOOOOOOOOOOOOOOOOOOO');
+	}
 	return [...this.parent.toPath(), ELEMENT_LIST_OFFSET + childIndex];
 };
 

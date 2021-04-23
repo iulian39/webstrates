@@ -104,6 +104,7 @@ function removeAttribute(rootElement, path, attributeName) {
 		return;
 	}
 
+	console.log('Arrived before target path node 2');
 	const isSvgPath = childElement.tagName.toLowerCase() === 'path' && attributeName === 'd';
 	if (isSvgPath) delete childElement.__d;
 	const oldValue = childElement.getAttribute(attributeName);
@@ -200,6 +201,8 @@ function deleteNode(rootElement, path) {
 	parentPathNode.children.splice(childIndex, 1);
 
 	// And remove the actual DOM node.
+	
+	console.log('Arrived before target path node 5');
 	childElement.remove();
 
 	// Notify nodeRemoved listeners.
@@ -254,6 +257,8 @@ function replaceNode(rootElement, path, value) {
 
 			// Overwrite old node with new node.
 			coreUtils.appendChildWithoutScriptExecution(parentElement, newElement, oldElement);
+			
+			console.log('Arrived before target path node 6');
 			oldElement.remove();
 
 			const newElementPathNode = corePathTree.create(newElement, parentPathNode, true);
@@ -614,11 +619,11 @@ coreOpApplier.listenForOpsAndApplyOn = (rootElement) => {
 		// We disable the mutation observers before applying the operations. Otherwise, applying the
 		// operations would cause new mutations to be created, which in turn would cause the
 		// creation of new operations, leading to a livelock for all clients.
-		coreMutation.pause();
+		// coreMutation.pause();
 
-		ops.forEach((op) => {
-			applyOp(op, rootElement);
-		});
+		// ops.forEach((op) => {
+		// 	applyOp(op, rootElement);
+		// });
 		
 		// const scripts = [];
 		// const html = coreJsonML.toHTML(doc, undefined, scripts);
@@ -638,7 +643,7 @@ coreOpApplier.listenForOpsAndApplyOn = (rootElement) => {
 
 		// And re-enable MuationObservers.
 	
-		coreMutation.resume();
+		// coreMutation.resume();
 	}, coreEvents.PRIORITY.IMMEDIATE);
 };
 

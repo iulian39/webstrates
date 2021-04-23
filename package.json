@@ -55,6 +55,7 @@
     "diff-match-patch": "1.0.4",
     "express": "4.17.1",
     "express-ws": "4.0.0",
+    "fs": "0.0.1-security",
     "fs-sync": "1.0.6",
     "graceful-fs": "4.2.3",
     "html-to-jsonml": "0.0.6",

@@ -8,7 +8,6 @@ const loadedEvent = require('./loadedEvent');
 
 const permissionsModule = {};
 const webstrateId = coreUtils.getLocationObject().webstrateId;
-console.log('motherfocker');
 
 // In static mode, the user does not receive the permissions. Since the webstrate doesn't change,
 // it also doesn't make sense to listen for permission changes, so we don't do that either.

@@ -30,7 +30,7 @@ corePopulator.populate = function(rootElement, webstrateId, arrayDoc) {
 		[ 'body', {}, '\n' ]
 	]}];
 	const initalizeOp = [{od: null, oi: 'true',p: [5, 1, 'data-gr-c-s-loaded']}];
-	const contentEditable = [{od: null, oi: "true",p: [5, 1, "contenteditable"]}];
+	const contentEditable = [{od: null, oi: 'true',p: [5, 1, 'contenteditable']}];
 	arrayDoc = json0.type.apply([], op);
 	arrayDoc = json0.type.apply(arrayDoc, initalizeOp);
 	arrayDoc = json0.type.apply(arrayDoc, contentEditable);
