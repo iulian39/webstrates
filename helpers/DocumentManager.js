@@ -122,7 +122,6 @@ module.exports.getDocument = function({ webstrateId, version, tag }, next) {
 		// if (ShareDbWrapper.fetch(webstrateId, next) === undefined){
 		// 	return undefined;
 		// } 
-		// console.log("RESPONSEEEEEEEEEEEEEEEE" + response);
 		// let value = ShareDbWrapper.fetch(webstrateId, next);
 		next();
 		return undefined;

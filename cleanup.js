@@ -28,7 +28,7 @@ const cleanUp = async () => {
 	// const assetsDb = new Set((await assetDbCursor.toArray()).map(o => o.fileName));
 
 	// console.log('Found', assetsFs.size, 'assets in database,', assetsDb.size, 'in file system.');
-	console.log('Now finding dangling files/entries. This can take a few minutes...');
+	//console.log('Now finding dangling files/entries. This can take a few minutes...');
 
 	const assetsOnlyInDb = [];
 	const assetsOnlyInFs = [];
@@ -45,30 +45,30 @@ const cleanUp = async () => {
 	// 	}
 	// });
 
-	console.log('Found', assetsOnlyInDb.length, 'assets that are only in database,',
+	//console.log('Found', assetsOnlyInDb.length, 'assets that are only in database,',
 		assetsOnlyInFs.length, 'that are only in the file system.');
-	console.log('(Note that duplicates are automatically removed from the file system, so it is ' +
+	//console.log('(Note that duplicates are automatically removed from the file system, so it is ' +
 		'natural that there might be more files in the database than in the file system.)');
 
 	if (assetsOnlyInDb.length === 0 && assetsOnlyInFs.length === 0) {
-		console.log('Nothing to clean up!');
+		//console.log('Nothing to clean up!');
 		process.exit(0);
 		return;
 	}
 
-	console.log('\nOnly in database:', assetsOnlyInDb.join(' '));
-	console.log('\nOnly in file system:', assetsOnlyInFs.join(' '));
+	//console.log('\nOnly in database:', assetsOnlyInDb.join(' '));
+	//console.log('\nOnly in file system:', assetsOnlyInFs.join(' '));
 
 	rl.question('Delete all dangling files/entries [y/N]? ', async (answer) => {
 		if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-			console.log('Deleting files from file system.');
+			//console.log('Deleting files from file system.');
 			const assetsFsPromises = assetsOnlyInFs.map(async (asset) => unlink(UPLOAD_DEST + asset));
 			await Promise.all(assetsFsPromises);
 
-			console.log('Deleting entries from database.');
+			//console.log('Deleting entries from database.');
 			// await db.assets.deleteMany({ fileName: { $in: assetsOnlyInDb }});
 
-			console.log('Done.');
+			//console.log('Done.');
 		} else {
 			console.log('Exiting without deleting.');
 		}

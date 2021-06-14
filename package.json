@@ -64,6 +64,7 @@
     "is-electron": "^2.2.0",
     "json0-ot-diff": "1.0.5",
     "jsonml-tools": "git+http://github.com/Webstrates/jsonml-tools.git#master",
+    "lodash": "^4.17.21",
     "md5-file": "4.0.0",
     "mime-types": "2.1.26",
     "mongodb": "3.4.1",

@@ -102,7 +102,7 @@ function attributeMutation(mutation, targetPathNode) {
 	// diffs as diffs only work between two known states, but we won't know the previous state if we
 	// have left out some ops. Just replacing a string with a new one doesn't require any knowledge
 	// about the current state.
-	console.log('Asdddd');
+	//console.log('Asdddd');
 	
 	let ops;
 	if (oldValue === null || newValue.length < 50 || !jsonmlAttrs[cleanAttributeName]
@@ -236,7 +236,6 @@ function childListMutation(mutation, targetPathNode) {
 					coreUtils.appendChildWithoutScriptExecution(childNode.parentElement,
 						replacementNode, childNode);
 						
-					console.log('Arrived before target path node 8');
 					childNode.remove();
 					childNode = replacementNode;
 				} else {
@@ -302,7 +301,6 @@ function childListMutation(mutation, targetPathNode) {
 			targetPathNode.children.push(newPathNode);
 		}
 		const path = corePathTree.getPathNode(addedNode, parentNode).toPath();
-		console.log('coreOpCreator bahui', coreJsonML.fromHTML(addedNode));
 		const op = { li: coreJsonML.fromHTML(addedNode), p: path };
 		ops.push(op);
 
@@ -321,7 +319,6 @@ function childListMutation(mutation, targetPathNode) {
 
 		const path = removedPathNode.toPath();
 		
-		console.log('Arrived before target path node 7');
 		removedPathNode.remove();
 		var jsonmlElement = coreDatabase.elementAtPath(path);
 		// If the element doesn't exist in the JsonML, we can't create an op for its deletion, and we
@@ -340,8 +337,21 @@ function childListMutation(mutation, targetPathNode) {
 	return ops;
 }
 
+const writeResultsToStorage = (name, array) => {
+	console.log('writeResultsToStorage', name);
+	localStorage.setItem(name, JSON.stringify(array));
+	const average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
+	const result = average( array ); // 5
+	console.log('Average = ' + result);
+	array = [];
+};
+
+let sendArray = [];
+let once = true;
+
 coreOpCreator.emitOpsFromMutations = () => {
 	coreEvents.addEventListener('mutation', (mutation) => {
+		const startDate = new Date();
 		const targetPathNode = corePathTree.getPathNode(mutation.target);
 
 		const elementTarget = mutation.target.nodeType === document.ELEMENT_NODE
@@ -423,6 +433,15 @@ coreOpCreator.emitOpsFromMutations = () => {
 
 		coreEvents.triggerEvent('createdOps', ops);
 
+		const endDate = new Date();
+		sendArray.push(endDate - startDate);
+		
+		if(once){
+			let name = 'OTsend_' + endDate.getTime();
+			setTimeout(() => writeResultsToStorage(name, sendArray), 1000000);
+			once = false;
+		}
+
 	}, coreEvents.PRIORITY.IMMEDIATE);
 };
 
@@ -465,13 +484,11 @@ coreOpCreator.ensureExistenceOfWids = targetElement => {
 };
 
 coreEvents.addEventListener('DOMNodeInserted', (node, parentElement, local) => {
-	console.log('DOMNodeInserted');
 	// If local is set, this node was inserted by ourself and thus already has a wid (if it needs to).
 	if (!local) coreOpCreator.addWidToElement(node);
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMNodeDeleted', node => {
-	console.log('DOMNodeDeleted');
 	if (node.__wid) {
 		coreUtils.removeWidFromElement(node.__wid);
 	}

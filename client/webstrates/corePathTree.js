@@ -59,14 +59,14 @@ function PathTree(DOMNode, parentPathTree, overwrite, addParentChild) {
 
 	// When moving an element around, a node may exist in two places at once for a brief moment.
 	// __pathNodes therefore has to be a list.
-	if (overwrite || !DOMNode.__pathNodes || DOMNode.__pathNodes.length === 0) {
-		DOMNode.__pathNodes = [this];
+	if (overwrite || !this.DOMNode.__pathNodes || this.DOMNode.__pathNodes.length === 0) {
+		this.DOMNode.__pathNodes = [this];
 	} else {
-		DOMNode.__pathNodes.push(this);
+		this.DOMNode.__pathNodes.push(this);
 	}
 
-	var childNodes = DOMNode.hasChildNodes() ? DOMNode.childNodes :
-		(DOMNode.content && DOMNode.content.childNodes) || [];
+	var childNodes = this.DOMNode.hasChildNodes() ? this.DOMNode.childNodes :
+		(this.DOMNode.content && this.DOMNode.content.childNodes) || [];
 	Array.from(childNodes).forEach(function(childNode) {
 		var childPathNode = PathTree.create(childNode, this, overwrite);
 		if (childPathNode) {
@@ -127,7 +127,6 @@ PathTree.prototype.toPath = function(kto) {
 	var ELEMENT_LIST_OFFSET = 2;
 	if(isAutomerge && childIndex === -1 && kto) {
 		childIndex = 0;
-		console.log('KTTTTTTTTTTTTTTTTTOOOOOOOOOOOOOOOOOOOOOOOOO');
 	}
 	return [...this.parent.toPath(), ELEMENT_LIST_OFFSET + childIndex];
 };
@@ -164,14 +163,12 @@ PathTree.prototype.remove = function(shallow) {
  */
 PathTree.prototype.check = function() {
 	if (this.DOMNode.__pathNodes.length > 1) {
-		console.log(this.DOMNode, this.DOMNode.__pathNodes);
 		window.alert('Webstrates has encountered an error. Please reload the page.');
 		throw 'Node has multiple paths';
 	}
 
 	var domNodePathNode = this.DOMNode.__pathNodes[0];
 	if (domNodePathNode.id !== this.id) {
-		console.log(this.DOMNode, this);
 		window.alert('Webstrates has encountered an error. Please reload the page.');
 		throw 'No id match';
 	}
@@ -191,7 +188,6 @@ PathTree.prototype.check = function() {
 	}.bind(this))();
 
 	if (definedChildNodesInDom.length !== this.children.length) {
-		console.log(definedChildNodesInDom, this.children, this);
 		window.alert('Webstrates has encountered an error. Please reload the page.');
 		throw 'Different amount of children';
 	}
@@ -203,7 +199,6 @@ PathTree.prototype.check = function() {
 			|| coreUtils.elementIsTemplateDescendant(childNode);
 	});
 	if (definedChildNodesInDom.length !== childNodes.length) {
-		console.log(definedChildNodesInDom, childNodes);
 		console.warn('Warning: Found zombie nodes in DOM.');
 	}
 

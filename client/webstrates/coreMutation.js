@@ -1,15 +1,8 @@
 'use strict';
 var coreEvents = require('./coreEvents');
 const coreUtils = require('./coreUtils');
-const coreJsonML = require('./coreJsonML');
-const pathTree = require('./corePathTree');
-const base64utils = require('./base64utils');
-const Automerge = require('automerge');
 
-const ATTRIBUTE_INDEX = 1;
 const coreMutation = {};
-let docObserver;
-let docElement;
 
 coreEvents.createEvent('mutation');
 
@@ -88,7 +81,6 @@ function teardownFragmentObserver(fragment) {
 	let fragmentObserver;
 	[fragment, fragmentObserver] = fragmentObservers[fragment.id];
 	fragmentObserver.disconnect();
-	console.log('Arrived before target path node');
 	delete fragmentObservers[fragment.id];
 	delete fragmentParentMap[fragment.id];
 }
@@ -105,7 +97,6 @@ coreEvents.createEvent('DOMNodeDeleted', { idempotent: true });
 // Whenever the DOM gets modified, we add/remove potential MutationObservers from documentFragments
 // (i.e. the things living inside <template>s).
 coreEvents.addEventListener('DOMNodeInserted', addedNode => {
-	console.log('DOMNodeInserted');
 	coreUtils.recursiveForEach(addedNode, (node) => {
 		if (node.content && node.content.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
 			setupFragmentObserver(node.content, node);
@@ -114,7 +105,6 @@ coreEvents.addEventListener('DOMNodeInserted', addedNode => {
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMNodeDeleted', removedNode => {
-	console.log('DOMNodeDeleted');
 	coreUtils.recursiveForEach(removedNode, function(node) {
 		if (node.content && node.content.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
 			teardownFragmentObserver(node.content);
@@ -135,7 +125,7 @@ Object.defineProperty(coreMutation, 'isPaused', {
 coreMutation.pause = () => {
 	if (isPaused) return;
 	Object.keys(fragmentObservers).forEach(function(fragmentId) {
-		var [_fragment, fragmentObserver] = fragmentObservers[fragmentId];
+		var [, fragmentObserver] = fragmentObservers[fragmentId];
 		fragmentObserver.disconnect();
 	});
 	primaryObserver.disconnect();

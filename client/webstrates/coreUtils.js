@@ -165,6 +165,11 @@ coreUtilsModule.appendChildWithoutScriptExecution = (parentElement, childElement
 {
 	// We just insert text nodes right away, we're only interested in doing fancy stuff with elements
 	// that may have scripts as children.
+	// if( childElement.tagName === 'HTML' && notHtml){
+	// 	parentElement.insertBefore(childElement.children[1], referenceNode || null);
+	// 	parentElement.insertBefore(childElement.children[0], parentElement.children[0]);
+	// 	return;
+	// }
 	if (!(childElement instanceof HTMLElement)) {
 		return parentElement.insertBefore(childElement, referenceNode || null);
 	}
@@ -247,7 +252,6 @@ coreUtilsModule.executeScripts = (scripts, callback) => {
 
 	script.parentElement.insertBefore(newScript, script);
 	
-	console.log('Arrived before target path node 9');
 	script.remove();
 
 	if (executeImmediately) {
@@ -265,8 +269,12 @@ coreUtilsModule.executeScripts = (scripts, callback) => {
  * @return {boolean}         True if the DOM Node is a descendant of a template.
  * @private
  */
-coreUtilsModule.elementIsTemplateDescendant = element =>
-	document.documentElement.ownerDocument !== element.ownerDocument;
+coreUtilsModule.elementIsTemplateDescendant = element => {
+	if(document.documentElement == null)
+		document.documentElement = element;
+	return document.documentElement.ownerDocument !== element.ownerDocument;
+};
+
 
 /**
  * Check if the current page has been transcluded (i.e. is an iframe)

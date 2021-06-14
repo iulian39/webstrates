@@ -6,31 +6,29 @@ let globel = {};
 let docAutomerge = {};
 
 function assignIds(amObj, domNode) {
-	if (domNode.nodeType === 3) {
+	if (!domNode || domNode.nodeType === 3) {
 		return;
 	}
-	// console.log('amObj', amObj);
 	let id = Automerge.getObjectId(amObj);
-	// console.log('id', id);
-	// let attributesId = Automerge.getObjectId(amObj.JsonML[1]);
 	let attributesId = Automerge.getObjectId(amObj[1]);
-	// console.log('attributesId', attributesId);	
 	domNode._amId = id;
 	domNode._amAttributesId = attributesId;
 	globel.nodeMap[id] = {type: 'node', node: domNode};
 	globel.nodeMap[attributesId] = {type: 'attributes', node: domNode};
 	if (Object.keys(amObj).length === 2 || domNode.nodeType === 3) return;
-	// if (Object.keys(amObj.JsonML).length === 2 || domNode.nodeType === 3) return;
 	for (let i = 2; i<Object.keys(amObj).length; i++) {
-		// assignIds(amObj.JsonML[i], domNode.childNodes[i-2]);
 		assignIds(amObj[i], domNode.childNodes[i-2]); 
 	}
 }
 
-function applyPatch(patch, documentElement, nodeMap, docAutomerge, bodyPathTree) {
+function applyPatch(patch, documentElement, nodeMap, docAutomerge, bodyPathTree, shouldAssignIds) {
 	globel.nodeMap = nodeMap;
 	globel.docAutomerge = docAutomerge;
 	globel.bodyPathTree = bodyPathTree;
+	if(shouldAssignIds){
+		const targetElement = coreDOM.externalDocument.childNodes[0];
+		assignIds(globel.docAutomerge.JsonML, targetElement);
+	}
 	let diffs = patch.diffs;
 	applyDiff(diffs, documentElement);
 }
@@ -65,33 +63,35 @@ function handleEdits(diff, parentNode, childIndex) {
 				if (index === 0) { // A new Element node is being created
 					let newNode = newElementNode(diff);
 					insertChildAtIndex(parentNode.node, newNode.node, childIndex-2);
-					// insertChildAtIndex(parentNode.node, newNode.node, childIndex-1);
 					i = i+1;
 					domNode = newNode;
 					continue;
 				}
 				let prop = getPropAtKey(diff.props, index);
 				if (!prop.type) { // It is a textnode
+					if(!domNode){
+						const targetElement = coreDOM.externalDocument.childNodes[0];
+						assignIds(globel.docAutomerge.JsonML, targetElement);
+						domNode = getDOMNodeFromAMId(objectId);
+					}
 					insertTextNode(domNode.node, index-2, prop.value, diff);
-					// insertTextNode(domNode.node, index, prop.value);
 				} else { // Its a new element node
 					handleEdits(prop, domNode, index);
 				}
 			}
 		} else if (edit.action === 'remove') {
 			let index = edit.index;
-			console.log('RIMOV??????');
-			let nodeToRemove = domNode.node.childNodes[index-2];
-			// let nodeToRemove = domNode.node.childNodes[index -1];
-			if(!nodeToRemove){
-				console.log('boom');
+			if(!domNode){
+				const targetElement = coreDOM.externalDocument.childNodes[0];
+				assignIds(globel.docAutomerge.JsonML, targetElement);
+				domNode = getDOMNodeFromAMId(objectId);
 			}
+			let nodeToRemove = domNode.node.childNodes[index-2];
+			
 			cleanDOMTree(nodeToRemove);
 			let elementPathTree = PathTree.getPathNode(domNode.node);
 			elementPathTree.children.splice(index-2, 1);
-			// elementPathTree.children.splice(index -1, 1);
 			
-			console.log('Arrived before target path node 10');
 			nodeToRemove.remove();
 		}
 	}
@@ -104,7 +104,12 @@ function handleEdits(diff, parentNode, childIndex) {
 		for (let prop in diff.props) {
 			let textNode = domNode.node.childNodes[prop-2];
 			let value = getPropAtKey(diff.props, prop).value;
-			textNode.nodeValue = value;
+			if(value.indexOf(textNode.nodeValue) !== -1){
+				textNode.nodeValue += value.substring(value.indexOf(textNode.nodeValue) + textNode.nodeValue.length);
+			} else{
+				textNode.nodeValue = value;
+			}
+			
 		}
 	}
 }
@@ -150,7 +155,12 @@ function newElementNode(diff) {
 		console.log('There\'s a conflict');
 	} else {
 		let prop = getPropAtKey(diff.props, 0);
-		el = doc.createElement(prop.value);
+		if (prop.value.toLowerCase() === 'svg' || prop.value.toLowerCase() === 'path') {
+			let xmlNs = 'http://www.w3.org/2000/svg';
+			el = doc.createElementNS(xmlNs, prop.value);
+		} else {
+			el = doc.createElement(prop.value);
+		}
 	}
 	if (diff.props[1].length > 0) {
 		console.log('There\'s a conflict');

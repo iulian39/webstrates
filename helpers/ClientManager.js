@@ -101,7 +101,7 @@ module.exports.addClient = function(ws, req, user) {
 		webstrateId: req.webstrateId,
 		userAgent: req.headers['user-agent']
 	};
-	console.log("addClient")
+	//console.log("addClient")
 
 	addUserClient(socketId, user.userId, userClient);
 
@@ -135,7 +135,7 @@ module.exports.addClient = function(ws, req, user) {
 const addUserClient = (socketId, userId, userClient) => {
 	userClients[userId] = userClients[userId] || {};
 	userClients[userId][socketId] = userClient;
-	console.log("addUserClient")
+	//console.log("addUserClient")
 	module.exports.broadcastToUserClients(userId, {
 		wa: 'userClientJoin',
 		id: socketId,

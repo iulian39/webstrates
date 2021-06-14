@@ -59,7 +59,7 @@ if (global.config.rateLimit) {
 
 		if ((data.a && ops.ops > config.rateLimit.opsPerInterval)
 		|| (data.wa && ops.signals > config.rateLimit.signalsPerInterval)) {
-			console.log('Blacklisting', req.remoteAddress, 'for exceeding rate limitation.');
+			//console.log('Blacklisting', req.remoteAddress, 'for exceeding rate limitation.');
 			ws.close(1013);
 			banClient();
 			return;
@@ -97,7 +97,7 @@ if (global.config.rateLimit) {
 		const currentTime = Date.now();
 		addressBanList.forEach((remoteAddress, timestamp) => {
 			if (timestamp + config.rateLimit.banDuration < currentTime) {
-				console.log('Removing', remoteAddress, 'from blacklist');
+				//console.log('Removing', remoteAddress, 'from blacklist');
 				addressBanList.delete(remoteAddress);
 			}
 		});

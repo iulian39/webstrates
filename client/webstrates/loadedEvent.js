@@ -21,7 +21,6 @@ let delayLoadedUntilPromises = [];
  * @public
  */
 loadedEventModule.delayUntil = (...args) => {
-	console.log('loaded');
 	var [eventName, ...eventNames] = args;
 	if (!eventName) return;
 
@@ -29,7 +28,6 @@ loadedEventModule.delayUntil = (...args) => {
 		// Low priority, because want need to ensure that this gets triggered after the webstrateId
 		// has been set on the wet publicObject (which we do below at medium priority).
 		coreEvents.addEventListener(eventName, accept, coreEvents.PRIORITY.LOW);
-		console.log('loaded1');
 	}));
 
 	loadedEventModule.delayUntil(...eventNames);
@@ -65,7 +63,7 @@ coreEvents.createEvent('loadedTriggered', {
 // Wait for all events to have been triggered, before firing the loaded event.
 coreEvents.addEventListener('allModulesLoaded', () => {
 
-	console.log('all modules loaded');
+	//console.log('all modules loaded');
 	Promise.all(delayLoadedUntilPromises).then(() => {		loadedTriggered = true;
 
 		globalObject.triggerEvent('loaded', globalObject.publicObject.webstrateId,

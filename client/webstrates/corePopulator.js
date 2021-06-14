@@ -5,15 +5,12 @@ const coreJsonML = require('./coreJsonML');
 const corePathTree = require('./corePathTree');
 const json0 = require('ot-json0');
 
-//const webrtc = require('../../y-webrtc');
-// import * as Y from 'yjs';
-// import { WebrtcProvider } from 'y-webrtc';
 
 const corePopulator = {};
 
 coreEvents.createEvent('populated');
 
-corePopulator.populate = function(rootElement, webstrateId, arrayDoc) {
+corePopulator.populate = function(rootElement, webstrateId, arrayDoc, noInit) {
 	// Empty the document, so we can use it.
 	while (rootElement.firstChild) {
 		rootElement.removeChild(rootElement.firstChild);
@@ -22,21 +19,21 @@ corePopulator.populate = function(rootElement, webstrateId, arrayDoc) {
 	// If the document doesn't exist (no type) or is empty (no data), we should recreate it, unless
 	// we're in static mode. We should never modify the document from static mode.
 
-	console.log('id:' + webstrateId);
-	const op = [{ 'p': [], 'oi': [
-		'html', {}, '\n',
-		[ 'head', {}, '\n',
-			[ 'title', {}, webstrateId ], '\n'], '\n',
-		[ 'body', {}, '\n' ]
-	]}];
-	const initalizeOp = [{od: null, oi: 'true',p: [5, 1, 'data-gr-c-s-loaded']}];
-	const contentEditable = [{od: null, oi: 'true',p: [5, 1, 'contenteditable']}];
-	arrayDoc = json0.type.apply([], op);
-	arrayDoc = json0.type.apply(arrayDoc, initalizeOp);
-	arrayDoc = json0.type.apply(arrayDoc, contentEditable);
+	if(!noInit){
+		let op = [{ 'p': [], 'oi': [
+			'html', {}, '\n',
+			[ 'head', {}, '\n',
+				[ 'title', {}, webstrateId ], '\n'], '\n',
+			[ 'body', {}, '\n' ]
+		]}];
+		const initalizeOp = [{od: null, oi: 'true',p: [5, 1, 'data-gr-c-s-loaded']}];
+		const contentEditable = [{od: null, oi: 'true',p: [5, 1, 'contenteditable']}];
+		arrayDoc = json0.type.apply([], op);
+		arrayDoc = json0.type.apply(arrayDoc, initalizeOp);
+	} else {
+		arrayDoc = JSON.parse(JSON.stringify(arrayDoc.JsonML));
+	}	
 	coreEvents.triggerEvent('initialize', arrayDoc);
-
-	console.log('Operation is:' +op);
 
 	// doc.submitOp(op);
 	// All documents are persisted as JsonML, so we only know how to work with JSON documents.
@@ -53,9 +50,9 @@ corePopulator.populate = function(rootElement, webstrateId, arrayDoc) {
 	coreUtils.appendChildWithoutScriptExecution(rootElement, html);
 
 	return new Promise((resolve) => {
-		console.log('executing scripts');
+		//console.log('executing scripts');
 		coreUtils.executeScripts(scripts, () => {
-			console.log('populated');
+			//console.log('populated');
 			// Do not include the parent element in the path, i.e. create corePathTree on the <html>
 			// element rather than the document element.
 			const targetElement = rootElement.childNodes[0];

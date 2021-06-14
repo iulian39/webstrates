@@ -35,6 +35,17 @@ if (isElectron()) {
 	coreDOMModule.externalDocument = _document;
 }
 
+coreDOMModule.resetDom = () => {
+	if (isElectron()) {
+		const documentProxyObj = {};
+		const documentProxy = new Proxy(document, documentProxyObj);
+		coreDOMModule.internalDocument = documentProxy;
+		coreDOMModule.externalDocument = document;
+	} else {
+		coreDOMModule.internalDocument = document;
+		coreDOMModule.externalDocument = _document;
+	}
+};
 
 
 const contexts = {

@@ -200,7 +200,6 @@ coreEvents.addEventListener('populated', targetElement => {
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMNodeInserted', node => {
-	console.log('nodeObjects DOMNodeInserted');
 	coreUtils.recursiveForEach(node, childNode => {
 		// The second argument is whether to trigger the webstrateObjectAdded event. We do want that.
 		attachWebstrateObjectToNode(childNode, true);
@@ -208,7 +207,6 @@ coreEvents.addEventListener('DOMNodeInserted', node => {
 }, coreEvents.PRIORITY.IMMEDIATE);
 
 coreEvents.addEventListener('DOMTextNodeInsertion', node => {
-	console.log('nodeObjects DOMTextNodeInsertion');
 	// The second argument is whether to trigger the webstrateObjectAdded event. We do want that.
 	attachWebstrateObjectToNode(node, true);
 }, coreEvents.PRIORITY.IMMEDIATE);

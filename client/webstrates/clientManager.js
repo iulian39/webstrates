@@ -39,7 +39,6 @@ if (!coreUtils.getLocationObject().staticMode) {
 
 	websocket.onjsonmessage = (message) => {
 		// Ignore message intended for other webstrates sharing the same websocket.
-		console.log('orice');
 		if (message.d !== webstrateId) return;
 
 		switch (message.wa) {

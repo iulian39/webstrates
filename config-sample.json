@@ -10,7 +10,7 @@
 			"secret": "This is a secret",
 			"duration": 31536000000
 		},
-		"permissionTimeout": 300,
+		"permissionTimeout": 3000,
 		"defaultPermissions": [
 			{"username": "anonymous", "provider": "", "permissions": "rw"}
 		],

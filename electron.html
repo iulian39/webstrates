@@ -15,10 +15,10 @@
 			</div>
 
 			<form>
-
 				<label class="label">Webstrate Name</label>
 				<input required type="text" id="webstrateName">
 				<button type="submit" id="connect" onclick="connectToWebstrate()">Connect</button>
+				<button id="loadWebstrate" onclick="loadDiskWebstrate()">Load webstrate from disk</button>
 			</form>
 
 			</section>
@@ -36,6 +36,7 @@
 		html,
 		.login_form {
 			height: 100%;
+			max-height: 880px;
 		}
 
 		body {
@@ -64,7 +65,7 @@
 		}
 
 		.login-wrapper {
-			max-width: 500px;
+			max-width: 1000px;
 			width: 100%;
 		}
 

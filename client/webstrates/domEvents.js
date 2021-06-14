@@ -68,7 +68,6 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 	coreEvents.addEventListener('DOMNodeInserted', (node, parentElement, local) => {
 		// Finding the event object of the parent instead of the node itself, as firing the event
 		// on the node itself isn't very useful.
-		console.log('domEvents DOMNodeInserted');
 		const eventObject = nodeObjects.getEventObject(parentElement);
 
 		// They parent may have been deleted, in which case there's no event object.
@@ -83,7 +82,6 @@ coreEvents.addEventListener('webstrateObjectsAdded', (nodes) => {
 	coreEvents.addEventListener('DOMNodeDeleted', (node, parentElement, local) => {
 		// Finding the event object of the parent instead of the node itself, as firing the event
 		// on the node itself isn't very useful.
-		console.log('domEvents DOMNodeDeleted');
 		const eventObject = nodeObjects.getEventObject(parentElement);
 
 		// They parent may have been deleted, in which case there's no event object.

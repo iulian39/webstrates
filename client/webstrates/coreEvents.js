@@ -120,3 +120,5 @@ coreEventsModule.triggerEvent = (eventName, ...args) => {
 };
 
 module.exports = coreEventsModule;
+
+coreEventsModule.createEvent('saveAutomerge');

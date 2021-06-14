@@ -13,7 +13,7 @@ const webstrateId = coreUtils.getLocationObject().webstrateId;
  * @public
  */
 globalObject.publicObject.newFromPrototypeFile = (desiredWebstrateId, options = {}) => {
-	console.log(desiredWebstrateId);
+	//console.log(desiredWebstrateId);
 	desiredWebstrateId = desiredWebstrateId || webstrateId;
 	return new Promise((accept, reject) => {
 		const input = document.createElement('input');

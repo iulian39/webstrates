@@ -167,13 +167,13 @@ app.post(/^\/([A-Z0-9._-]+)\/$/i,
 
 // Catch all for get.
 app.get(function(req, res) {
-	console.log("app.get")
+	// console.log("app.get")
 	res.send('Invalid request URL.');
 });
 
 // Catch all for post.
 app.post(function(req, res) {
-	console.log("app.post")
+	// console.log("app.post")
 	res.send('You can only post assets to URLs of the form /<webstrateId>/.');
 });
 
@@ -181,7 +181,7 @@ app.post(function(req, res) {
 	Middleware for extracting user data from cookies used for Express HTTP requests only.
  */
 const sessionMiddleware = function(req, res, next) {
-	console.log("session MIDDLEWARE")
+	// console.log("session MIDDLEWARE")
 	let webstrateId;
 
 	const match = req.url.match(/^\/([A-Z0-9._-]+)\//i);
@@ -214,7 +214,7 @@ const sessionMiddleware = function(req, res, next) {
 };
 
 const middleware = [];
-console.log("BEFORE MIDDLEWARRE")
+// console.log("BEFORE MIDDLEWARRE")
 middleware.push(require('./middleware/dosProtectionMiddleware.js'));
 middleware.push(require('./middleware/keepAliveMiddleware.js'));
 if (config.godApi) {
@@ -231,20 +231,18 @@ middleware.push(require('./middleware/customActionHandlerMiddleware.js'));
  * @params {middleware} middleware  All middleware objects passed in as arguments.
  */
 function runMiddleware(type, args, middleware, ...middlewares) {
-	console.log("RUN MIDDLEWAREEEE 1")
+	//console.log("RUN MIDDLEWAREEEE 1")
 	if (!middleware) return;
-	console.log("RUN MIDDLEWAREEEE 2")
+	//console.log("RUN MIDDLEWAREEEE 2")
 	if (!middleware[type]) return runMiddleware(type, args, ...middlewares);
-	console.log("RUN MIDDLEWAREEEE 3")
+	//console.log("RUN MIDDLEWAREEEE 3")
 	middleware[type](...args, () => runMiddleware(type, args, ...middlewares));
 }
 
 app.ws('*', (ws, req) => {
-	console.log("sa-mi bag pula SE STIEE")
 	const socketId = clientManager.addClient(ws, req, req.user);
 	req.socketId = socketId;
 
-	console.log("sa-mi bag pula")
 	// req.socket.setTimeout(30 * 1000);
 
 	// We replace `ws.send` with a function that doesn't throw an exception if the message fails.

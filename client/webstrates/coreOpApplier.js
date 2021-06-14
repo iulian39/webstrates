@@ -104,7 +104,6 @@ function removeAttribute(rootElement, path, attributeName) {
 		return;
 	}
 
-	console.log('Arrived before target path node 2');
 	const isSvgPath = childElement.tagName.toLowerCase() === 'path' && attributeName === 'd';
 	if (isSvgPath) delete childElement.__d;
 	const oldValue = childElement.getAttribute(attributeName);
@@ -202,7 +201,6 @@ function deleteNode(rootElement, path) {
 
 	// And remove the actual DOM node.
 	
-	console.log('Arrived before target path node 5');
 	childElement.remove();
 
 	// Notify nodeRemoved listeners.
@@ -258,7 +256,6 @@ function replaceNode(rootElement, path, value) {
 			// Overwrite old node with new node.
 			coreUtils.appendChildWithoutScriptExecution(parentElement, newElement, oldElement);
 			
-			console.log('Arrived before target path node 6');
 			oldElement.remove();
 
 			const newElementPathNode = corePathTree.create(newElement, parentPathNode, true);
@@ -432,7 +429,11 @@ function insertInText(rootElement, path, charIndex, value) {
 				const newValue = oldValue.substring(0, charIndex)
 					+ value + oldValue.substring(charIndex);
 				if (isSvgPath) childElement.__d = newValue;
-				childElement.setAttribute(attributeName, newValue);
+				try {
+					childElement.setAttribute(attributeName, newValue);	
+				} catch (e) {					
+				}
+				
 				coreEvents.triggerEvent('DOMAttributeSet', childElement, attributeName, oldValue, newValue,
 					false);
 				coreEvents.triggerEvent('DOMAttributeTextInsertion', childElement, attributeName, charIndex,
@@ -506,7 +507,11 @@ function deleteInText(rootElement, path, charIndex, value) {
 				const newValue = oldValue.substring(0, charIndex)
 					+ oldValue.substring(charIndex + value.length);
 				if (isSvgPath) childElement.__d = newValue;
-				childElement.setAttribute(attributeName, newValue);
+				try {
+					childElement.setAttribute(attributeName, newValue);	
+				} catch (error) {			
+				}
+				
 				coreEvents.triggerEvent('DOMAttributeSet', childElement, attributeName, oldValue, newValue,
 					false);
 				coreEvents.triggerEvent('DOMAttributeTextDeletion', childElement, attributeName, charIndex,
@@ -619,31 +624,13 @@ coreOpApplier.listenForOpsAndApplyOn = (rootElement) => {
 		// We disable the mutation observers before applying the operations. Otherwise, applying the
 		// operations would cause new mutations to be created, which in turn would cause the
 		// creation of new operations, leading to a livelock for all clients.
-		// coreMutation.pause();
+		coreMutation.pause();
 
-		// ops.forEach((op) => {
-		// 	applyOp(op, rootElement);
-		// });
-		
-		// const scripts = [];
-		// const html = coreJsonML.toHTML(doc, undefined, scripts);
-		// coreUtils.executeScripts(scripts, () => {})
-		// if(scripts.length > 0)
-		// 	console.log(scripts.length)
-		// coreUtils.appendChildWithoutScriptExecution(rootElement, html);
+		ops.forEach((op) => {
+			applyOp(op, rootElement);
+		});
 	
-		// coreUtils.executeScripts(scripts, () => {
-		// 	console.log('populated');
-		// 	// Do not include the parent element in the path, i.e. create corePathTree on the <html>
-		// 	// element rather than the document element.
-		// 	const targetElement = rootElement.childNodes[0];
-		// 	const pathTree = corePathTree.create(targetElement, null, true);
-		// 	coreEvents.triggerEvent('populated', targetElement, webstrateId);
-		// });
-
-		// And re-enable MuationObservers.
-	
-		// coreMutation.resume();
+		coreMutation.resume();
 	}, coreEvents.PRIORITY.IMMEDIATE);
 };
 
