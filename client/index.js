@@ -18,7 +18,7 @@ const corePopulator = require(basePath + 'webstrates/corePopulator');
 const coreUtils = require(basePath + 'webstrates/coreUtils');
 const config = require(basePath + 'config');
 
-const isAutomerge = true;
+const isAutomerge = false;
 coreEvents.createEvent('loadDocAutomerge');
 
 

@@ -7,30 +7,22 @@ const corePathTree = require('./corePathTree');
 const corePatchApplier = require('./corePatchApplier');
 const coreDOM = require('./coreDOM');
 const coreMutations = require('./coreMutation');
-const coreOpCreator = require('./coreOpCreator');
-const coreOpApplier = require('./coreOpApplier');
 const base64utils = require('./base64utils');
 const automergeDocc = require('./automergeDocc');
-//const coreWebsocket = require('./coreWebsocket');
 const globalObject = require('./globalObject');
 const Y = require('yjs');
 const rtc = require('y-webrtc');
 const json0 = require('ot-json0');
-//const Automerge = require('automerge');
 const Automerge = require('./automerge-performance');
-const corePopulator = require('./corePopulator');
-// const sharedb = require('sharedb/lib/client');
 const COLLECTION_NAME = 'webstrates';
 const _ = require('lodash');
 
 coreEvents.createEvent('receivedDocument');
 coreEvents.createEvent('receivedOps');
-// coreEvents.createEvent('databaseError');
 coreEvents.createEvent('opsAcknowledged');
 coreEvents.createEvent('initialize');
-// var Y = require('yjs');
-// import { WebrtcProvider } from 'y-webrtc'
-const isAutomerge = true;
+
+const isAutomerge = false;
 let docAutomerge = Automerge.init(); // doc = {}
 let doc, provider, arrayOp, newDoc, newDoc2, opCounter = 0;
 const ydoc = new Y.Doc();
@@ -50,15 +42,11 @@ const observerOptions = {
 const ATTRIBUTE_INDEX = 1;
 const nodeMap = {};
 
-// const ydoc = new Y.Doc()
-//  const provider = new WebrtcProvider('myRoom', ydoc)
-
-
 /**
- * Get the ShareDB document, or get an element at a certain path in the document if a path is
+ * Get the JsonML document, or get an element at a certain path in the document if a path is
  * provided.
- * @param  {Array} path  (optional) Path into the ShareDB document.
- * @return {mixed}       ShareDB document object or a path into the document.
+ * @param  {Array} path  (optional) Path into the JsonML document.
+ * @return {mixed}       JsonML document object or a path into the document.
  * @public
  */
 exports.getDocument = path => {
@@ -140,9 +128,7 @@ const observeFunction = () => {
 		let op = {
 			...allOps[i]
 		};
-		// op.p = op.p.split(',');
 		ops.push(op);
-		//console.log(op.p);
 	}
 	//console.log('Operations End');
 
@@ -156,22 +142,13 @@ const observeFunction = () => {
 	}
 	// Apply changes to the DOM
 	coreEvents.triggerEvent('receivedOps', ops, doc, 'test');
-	//console.log('RECEIVED AT : ' + new Date().getTime());
 	const scripts = [];
 	const html = coreJsonML.toHTML(doc, undefined, scripts);
-	//console.log(scripts);
-	if(scripts.length < 0 && allOps.length <= 10){ // PAUSED FOR TESTING
+	if(scripts.length < 0 && allOps.length <= 10){ // PAUSED FOR TESTING | For drawing to work
 		coreMutations.pause();
 		document.querySelector('html').remove();
-		// document.querySelector('body').remove();
-		// for(let i = 0; i < html.children.length; i++)
-		// let ourHtml = document.querySelector('html');
-		// coreDOM.externalDocument.childNodes[0].insertBefore(html.children[1], null);
-		// coreDOM.externalDocument.childNodes[0].insertBefore(html.children[0], ourHtml.children[0]);
 		coreUtils.appendChildWithoutScriptExecution(coreDOM.externalDocument, html);
-		// coreUtils.appendChildWithoutScriptExecution(coreDOM.externalDocument, html.children[1]);
 		coreUtils.executeScripts(scripts, () => {
-			// let asd = corePathTree.getPathNode(coreDOM.externalDocument.childNodes[0]);
 			const targetElement = coreDOM.externalDocument.childNodes[0];
 			const pathTree = corePathTree.create(targetElement, null, true);
 			pathTree.check();
@@ -182,13 +159,6 @@ const observeFunction = () => {
 
 	const endDate = new Date();
 	receiveArray.push(endDate - startDate);
-	// will cancel the execution of thing if executed before 1 second
-	
-	// window.clearTimeout(timeoutHandle);
-
-	// then call setTimeout again to reset the timer
-	
-	// debouncedThing(name, receiveArray);
 	if(once){
 		let name = 'OTreceive_' + endDate.getTime();
 		setTimeout(() => writeResultsToStorage(name, receiveArray), 1000000);
@@ -230,11 +200,7 @@ const historyRollback = (docAm, currentElements, desiredElements, path) => {
 };
 
 const rollback = () => {
-	let history = Automerge.getHistory(docAutomerge);
-	// console.log('History', history);
-
-	// pauzaaaaa
-	
+	let history = Automerge.getHistory(docAutomerge);	
 
 	const historyIndex = 5;
 	if (history.length === -1) {
@@ -264,8 +230,7 @@ const rollback = () => {
 		// send the changes to other peers
 		coreEvents.triggerEvent('signalAutoMerge', changes);
 		resume();
-		return;
-		
+		return;		
 	}
 };
 
@@ -278,68 +243,29 @@ const observeFunctionAutomerge = () => {
 	
 	
 	if(opCounter >= allOps.length){
-		// const scripts = [];
-		// const html = coreJsonML.toHTML(docAutomerge.JsonML, undefined, scripts);
-		// console.log('HTML din ala smecher', html);
-		// coreUtils.executeScripts(scripts, () => {});
 		return;
 	}
 	ops = allOps.slice(opCounter);
 	opCounter = allOps.length;
-	// max > latestExecutedSec ? latestExecutedSec = max : null;
-	//console.log('Automerge End');
 	pause();
 	const backendState = Automerge.Frontend.getBackendState(docAutomerge);
 	const [newState, patch] = Automerge.Backend.applyChanges(backendState, ops);
 	patch.state = newState;
-	//console.log('State' , newState, 'Patch' , patch);
 
 	docAutomerge = Automerge.Frontend.applyPatch(docAutomerge, patch);
-	//console.log('doccccccc', docAutomerge);
 	
 	const documentElement = coreDOM.externalDocument.childNodes[0];
 	const bodyPathTree = corePathTree.getPathNode(document.body);
-
-	// if(patch.diffs.objectId === '00000000-0000-0000-0000-000000000000'){
-	// 	patch.diffs = patch.diffs.props.JsonML[Object.keys(patch.diffs.props.JsonML)[0]];
-	// 	console.log(patch);
-	// }
-
 	corePatchApplier.applyPatch(patch, documentElement, nodeMap, docAutomerge, bodyPathTree);
-
-	// const scripts = [];
-	// const html = coreJsonML.toHTML(docAutomerge.JsonML, undefined, scripts);
-	// console.log('HTML din ala smecher', html);
-	//coreUtils.appendChildWithoutScriptExecution(documentElement, html);
-	// let a = Automerge.save(docAutomerge);
-	// console.log('savee' , base64utils.bytesArrToBase64(a));
 	resume();
 		
-
-	
-	// const html1 = coreJsonML.toHTML(docAutomerge, undefined, []);
-	// console.log(html1);
-	// const targetElement = coreDOM.externalDocument.childNodes[0];
-	// console.log(Automerge.save(docAutomerge));
-	// coreMutations.pause();
-	// corePatchApplier.applyPatch(patch, targetElement);
-	// coreMutations.resume();
-	const endDate = new Date();
-	receiveArray.push(endDate - startDate);
-	// will cancel the execution of thing if executed before 1 second
-	
-	// window.clearTimeout(timeoutHandle);
-
-	// then call setTimeout again to reset the timer
-	
-	// debouncedThing(name, receiveArray);
-	if(once){
-		let name = 'CRDTreceive_' + endDate.getTime();
-		setTimeout(() => writeResultsToStorage(name, receiveArray), 1000000);
-		once = false;
-	}
-
-	// timeoutHandle = 
+	// const endDate = new Date();
+	// receiveArray.push(endDate - startDate);
+	// if(once){
+	// 	let name = 'CRDTreceive_' + endDate.getTime();
+	// 	setTimeout(() => writeResultsToStorage(name, receiveArray), 1000000);
+	// 	once = false;
+	// }
 };
 
 exports.subscribe = (webstrateId, docFromFile) => {
@@ -371,9 +297,6 @@ exports.subscribe = (webstrateId, docFromFile) => {
 				// Update the last applied operations
 				opCounter += ops.slice().length;
 
-				// ops[0].p = ops[0].p.join();
-				// Add the operations to the y-array
-				//console.log('SENT AT : ' + new Date().getTime());
 				arrayOp.push(JSON.parse(JSON.stringify(ops)));
 
 			}, coreEvents.PRIORITY.IMMEDIATE);
@@ -382,7 +305,6 @@ exports.subscribe = (webstrateId, docFromFile) => {
 			// Further down we'll simulate a second device.
 			// We initialize the document to initially contain an empty list of cards.
 			
-			//If YJS nu e populat
 			arrayOp = ydoc.getArray('autoMerge');
 			arrayOp.observeDeep(observeFunctionAutomerge);
 			if(docFromFile){
@@ -391,9 +313,6 @@ exports.subscribe = (webstrateId, docFromFile) => {
 				let changes = Automerge.getAllChanges(docAutomerge);
 				arrayOp.push([...changes]);
 				opCounter += changes.length;
-				// const targetElement = coreDOM.externalDocument.childNodes[0];
-				// assignIds(docAutomerge.JsonML, targetElement);
-				// observe(targetElement);
 			}
 
 			doc = [];
@@ -410,8 +329,7 @@ exports.subscribe = (webstrateId, docFromFile) => {
 
 				const targetElement = coreDOM.externalDocument.childNodes[0];
 				assignIds(docAutomerge.JsonML, targetElement);
-				observe(targetElement);
-				// resume();				
+				observe(targetElement);				
 			});
 
 			coreEvents.addEventListener('loadDocAutomerge', (doc) => {				
@@ -428,18 +346,12 @@ exports.subscribe = (webstrateId, docFromFile) => {
 					}
 				});
 				let changes  = Automerge.getChanges(docAutomerge, newDoc1);
-		
-				// console.log('BEFORE SENDING THE DOC 1', docAutomerge);
-				//docAutomerge = newDoc;
 				pause();
 				
 				const [newState, patch] = Automerge.Backend.applyChanges(backendState, changes);
-				// const [newState, patch] = Automerge.Backend.applyChanges(backendState, allOps);
 				patch.state = newState;
-				//console.log('State' , newState, 'Patch' , patch);
 
 				docAutomerge = Automerge.Frontend.applyPatch(docAutomerge, patch);
-				//console.log('doccccccc', docAutomerge);
 				const documentElementz = coreDOM.externalDocument.childNodes[0];
 				const bodyPathTreez = corePathTree.getPathNode(document.body);
 				corePatchApplier.applyPatch(patch, documentElementz, nodeMap, docAutomerge, bodyPathTreez);
@@ -454,10 +366,7 @@ exports.subscribe = (webstrateId, docFromFile) => {
 			}, coreEvents.PRIORITY.IMMEDIATE);
 
 			coreEvents.addEventListener('signalAutoMerge', (changes) => {
-				//console.log('am primit changes', changes);
 				opCounter += changes.slice().length;
-				const bytezz = base64utils.bytesToString(changes);
-				//console.log(bytezz);
 				arrayOp.push(changes);
 
 			}, coreEvents.PRIORITY.IMMEDIATE);
@@ -467,7 +376,6 @@ exports.subscribe = (webstrateId, docFromFile) => {
 			resolve(docAutomerge);
 		else
 			resolve(doc);
-		// });
 	});
 };
 
@@ -507,7 +415,6 @@ exports.restore = (webstrateId, tagOrVersion, callback) => {
 		msgObj.l = tagOrVersion;
 	}
 
-	//coreWebsocket.send(msgObj, callback);
 };
 
 /**
@@ -580,11 +487,8 @@ function observe (documentElement) {
 			removedPathNode.remove();
 			
 			newDoc = Automerge.change(docAutomerge, doc => {
-				//console.log(doc, doc.JsonML);
 				let parent = elementAtPath(doc.JsonML, path.slice(0,-1));
-				//console.log(parent);
 				parent.splice(path[path.length - 1], 1);
-				//console.log(parent);
 			});
 			let changes  = Automerge.getChanges(docAutomerge, newDoc);				
 			changeArr.push(changes[0]);
@@ -635,7 +539,6 @@ function observe (documentElement) {
 						coreUtils.appendChildWithoutScriptExecution(childNode.parentElement,
 							replacementNode, childNode);
 							
-						//console.log('Arrived before target path node 4');
 						childNode.remove();
 						childNode = replacementNode;
 					} else {
@@ -701,15 +604,10 @@ function observe (documentElement) {
 				targetPathNode.children.push(newPathNode);
 			}
 			const path = corePathTree.getPathNode(addedNode, parentNode).toPath();
-			//console.log('PETHHHH', path);
 			
 			newDoc = Automerge.change(docAutomerge, doc => {
-			// newDoc = Automerge.change(docAutomerge, doc => {
-				//console.log(doc.JsonML);
 				let parent = elementAtPath(doc.JsonML, path.slice(0,-1));				
-				//console.log(parent);
 				parent.splice(path[path.length - 1], 0, coreJsonML.fromHTML(addedNode));
-				//console.log(parent, 'From HTML', coreJsonML.fromHTML(addedNode));
 			});
 
 			let changes = Automerge.getChanges(docAutomerge, newDoc);
@@ -723,7 +621,6 @@ function observe (documentElement) {
 	}
 
 	function characterDataMutation(mutation, targetPathNode) {
-		// const path = targetPathNode.toPath(true);
 		const path = targetPathNode.toPath(true);
 
 		const newValue = mutation.target.data.replace(/ /g, ' ');
@@ -734,7 +631,6 @@ function observe (documentElement) {
 		});
 		let changes  = Automerge.getChanges(docAutomerge, newDoc);
 		docAutomerge = newDoc;
-		//console.log('BEFORE SENDING THE DOC 3', docAutomerge);
 		coreEvents.triggerEvent('signalAutoMerge', changes);
 	}
 
@@ -743,14 +639,12 @@ function observe (documentElement) {
 		const targetPathNodeJsonML = targetPathNode.toPath();
 
 		newDoc = Automerge.change(docAutomerge, doc => {
-			//console.log('DOC JSONML', doc.JsonML);
 			let node = elementAtPath(doc.JsonML, targetPathNodeJsonML);
 			node[ATTRIBUTE_INDEX][attributeName] = mutation.target.getAttribute(attributeName);
 		});
 		let changes  = Automerge.getChanges(docAutomerge, newDoc);
 		docAutomerge = newDoc;
 
-		//console.log('BEFORE SENDING THE DOC 4', docAutomerge);
 		coreEvents.triggerEvent('signalAutoMerge', changes);
 	}
 
@@ -774,7 +668,6 @@ function observe (documentElement) {
 
 	docObserver = new MutationObserver(mutationsHandler);
 	docObserver.observe(documentElement, observerOptions);
-	//assignIds(docAutomerge, documentElement);
 }
 
 function pause() {
@@ -789,20 +682,14 @@ function assignIds(amObj, domNode) {
 	if (domNode.nodeType === 3) {
 		return;
 	}
-	//console.log('amObj', amObj);
 	let id = Automerge.getObjectId(amObj);
-	//console.log('id', id);
-	// let attributesId = Automerge.getObjectId(amObj.JsonML[1]);
 	let attributesId = Automerge.getObjectId(amObj[1]);
-	//console.log('attributesId', attributesId);	
 	domNode._amId = id;
 	domNode._amAttributesId = attributesId;
 	nodeMap[id] = {type: 'node', node: domNode};
 	nodeMap[attributesId] = {type: 'attributes', node: domNode};
 	if (Object.keys(amObj).length === 2 || domNode.nodeType === 3) return;
-	// if (Object.keys(amObj.JsonML).length === 2 || domNode.nodeType === 3) return;
 	for (let i = 2; i<Object.keys(amObj).length; i++) {
-		// assignIds(amObj.JsonML[i], domNode.childNodes[i-2]);
 		assignIds(amObj[i], domNode.childNodes[i-2]); 
 	}
 }

@@ -1,6 +1,6 @@
 'use strict';
 const coreUtils = require('./coreUtils');
-const isAutomerge = true;
+const isAutomerge = false;
 let idNr = 0;
 /*
 Webstrates PathTree (webstrates.pathree.js)
